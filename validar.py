@@ -404,14 +404,47 @@ def validar_fila_etb(row, idx):
 # MOTOR GENÉRICO
 # ══════════════════════════════════════════════════════════════════════════════
 
+def validar_duplicados_handle(df):
+    """
+    Detecta valores duplicados en la columna HANDLE.
+    Retorna lista de errores indicando en qué filas se repite el valor.
+    """
+    errores = []
+    if "HANDLE" not in df.columns:
+        return errores
+    handle_series = df["HANDLE"].apply(lambda v: str(v).strip() if not_empty(v) else None)
+    grupos = {}
+    for idx, val in handle_series.items():
+        if val is None:
+            continue
+        grupos.setdefault(val, []).append(idx)
+    for val, indices in grupos.items():
+        if len(indices) > 1:
+            filas_duplicadas = sorted([i + 2 for i in indices])
+            for idx in indices:
+                errores.append({
+                    "Fila":  idx + 2,
+                    "Campo": "HANDLE",
+                    "Valor": val,
+                    "Error": f"DUPLICADO — mismo HANDLE encontrado en filas: {', '.join(map(str, filas_duplicadas))}"
+                })
+    return errores
+
+
 def validar_dataframe(df, operador):
     todos = []
     fn = validar_fila_claro if operador == "CLARO" else validar_fila_etb
     for idx, row in df.iterrows():
         todos.extend(fn(row, idx))
+
+    # Validación de duplicados en HANDLE (solo aplica a CLARO)
+    if operador == "CLARO":
+        todos.extend(validar_duplicados_handle(df))
+
     result = pd.DataFrame(todos)
     if result.empty:
         result = pd.DataFrame(columns=["Fila", "Campo", "Valor", "Error"])
+    result = result.sort_values("Fila").reset_index(drop=True)
     return result
 
 def normalizar_columnas(df, columnas_req):
