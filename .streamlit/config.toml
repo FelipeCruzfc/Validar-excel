@@ -1,0 +1,11 @@
+[theme]
+base = "light"
+primaryColor = "#0E6973"
+backgroundColor = "#EEF1F4"
+secondaryBackgroundColor = "#E2E7EC"
+textColor = "#172033"
+borderColor = "#D5DBE3"
+showWidgetBorder = true
+baseRadius = "8px"
+font = "Atkinson Hyperlegible:https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap, sans-serif"
+headingFont = "Archivo:https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&display=swap, sans-serif"
